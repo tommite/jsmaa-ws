@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fi.smaa</groupId>
+  <artifactId>jsmaa-webservice</artifactId>
+  <version>0.2</version>
+  <packaging>pom</packaging>
+  <name>jsmaa-webs-pom</name>
+
+    <repositories>
+	<repository>
+	    <id>jsmaa</id>
+	    <name>smaa mvn repo</name>
+	    <url>http://smaa.fi/mvn</url>
+	</repository>
+    </repositories>
+  <distributionManagement>
+    <repository>
+      <uniqueVersion>false</uniqueVersion>
+      <id>smaa.fi</id>
+      <name>smaa.fi repository</name>
+      <url>scp://tommi@medusa.tutka.net/home/tommi/smaa_html/mvn</url>
+      <layout>default</layout>
+    </repository>
+  </distributionManagement>	
+
+  <build>
+    <plugins>
+      <plugin>
+	<artifactId>maven-eclipse-plugin</artifactId>
+	<configuration>
+	  <downloadJavadocs>true</downloadJavadocs>
+	  <downloadSources>true</downloadSources>
+	</configuration>
+      </plugin>
+    </plugins>		
+  </build>
+
+    <properties>
+	<cxf.version>2.2.3</cxf.version>
+    </properties>
+    
+    <dependencies>
+	<dependency>
+	    <groupId>fi.smaa.jsmaa</groupId>
+	    <artifactId>lib</artifactId>
+	    <version>0.8.2</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.apache.xmlbeans</groupId>
+	    <artifactId>xmlbeans</artifactId>
+	    <version>2.4.0</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.apache.cxf</groupId>
+	    <artifactId>cxf-rt-frontend-jaxws</artifactId>
+	    <version>${cxf.version}</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.apache.cxf</groupId>
+	    <artifactId>cxf-rt-transports-http</artifactId>
+	    <version>${cxf.version}</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.apache.cxf</groupId>
+	    <artifactId>cxf-rt-transports-http-jetty</artifactId>
+	    <version>${cxf.version}</version>
+	</dependency>
+    </dependencies>
+</project>
