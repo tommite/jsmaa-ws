@@ -4,8 +4,6 @@
   <groupId>fi.smaa</groupId>
   <artifactId>jsmaa-webservice</artifactId>
   <version>0.2</version>
-  <packaging>pom</packaging>
-  <name>jsmaa-webs-pom</name>
 
     <repositories>
 	<repository>
@@ -22,19 +20,37 @@
       <url>scp://tommi@medusa.tutka.net/home/tommi/smaa_html/mvn</url>
       <layout>default</layout>
     </repository>
-  </distributionManagement>	
-
-  <build>
-    <plugins>
-      <plugin>
-	<artifactId>maven-eclipse-plugin</artifactId>
-	<configuration>
-	  <downloadJavadocs>true</downloadJavadocs>
-	  <downloadSources>true</downloadSources>
-	</configuration>
-      </plugin>
-    </plugins>		
-  </build>
+    </distributionManagement>	
+    
+    <build>
+	<plugins>
+	    <plugin>
+		<artifactId>maven-eclipse-plugin</artifactId>
+		<configuration>
+		    <downloadJavadocs>true</downloadJavadocs>
+		    <downloadSources>true</downloadSources>
+		    <sourceIncludes>
+			<sourceInclude>
+			    target/generated-sources/**/*.java
+			</sourceInclude>
+		    </sourceIncludes>
+		</configuration>
+	    </plugin>
+	    <plugin>
+		<groupId>org.codehaus.mojo</groupId>
+		<artifactId>xmlbeans-maven-plugin</artifactId>
+		<version>2.3.3</version>
+		<executions>
+		    <execution>
+			<phase>generate-sources</phase>
+			<goals>
+			    <goal>xmlbeans</goal>
+			</goals>
+		    </execution>
+		</executions>
+	    </plugin>
+	</plugins>		
+    </build>
 
     <properties>
 	<cxf.version>2.2.3</cxf.version>
@@ -52,19 +68,15 @@
 	    <version>2.4.0</version>
 	</dependency>
 	<dependency>
-	    <groupId>org.apache.cxf</groupId>
-	    <artifactId>cxf-rt-frontend-jaxws</artifactId>
-	    <version>${cxf.version}</version>
+	    <groupId>org.apache.axis2</groupId>
+	    <artifactId>axis2</artifactId>
+	    <version>1.5.4</version>
 	</dependency>
 	<dependency>
-	    <groupId>org.apache.cxf</groupId>
-	    <artifactId>cxf-rt-transports-http</artifactId>
-	    <version>${cxf.version}</version>
-	</dependency>
-	<dependency>
-	    <groupId>org.apache.cxf</groupId>
-	    <artifactId>cxf-rt-transports-http-jetty</artifactId>
-	    <version>${cxf.version}</version>
-	</dependency>
+	    <groupId>junit</groupId>
+	    <artifactId>junit</artifactId>
+	    <version>4.6</version>
+	    <scope>test</scope>
+	</dependency>	
     </dependencies>
 </project>
