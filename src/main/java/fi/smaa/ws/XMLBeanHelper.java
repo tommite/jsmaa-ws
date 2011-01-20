@@ -10,6 +10,10 @@ public class XMLBeanHelper {
 	}
 	
 	 public SMAATRIModel fromBeanToJSMAA(SMAATRIModelDocument doc) {
+		 SMAATRIModelDocument.SMAATRIModel x = doc.getSMAATRIModel();
+	 }
+	 
+	 public SMAATRIModelDocument fromJSMAAToBean(SMAATRIModel model) {
 		 return null;
 	 }
  
