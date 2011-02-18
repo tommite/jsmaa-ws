@@ -51,10 +51,6 @@
 	    </plugin>
 	</plugins>		
     </build>
-
-    <properties>
-	<cxf.version>2.2.3</cxf.version>
-    </properties>
     
     <dependencies>
 	<dependency>
