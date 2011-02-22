@@ -2,7 +2,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>fi.smaa</groupId>
-  <artifactId>jsmaa-webservice</artifactId>
+  <artifactId>jsmaa-ws</artifactId>
   <version>0.2-SNAPSHOT</version>
 
     <repositories>
@@ -12,21 +12,53 @@
 	    <url>http://smaa.fi/mvn</url>
 	</repository>
     </repositories>
-  <distributionManagement>
-    <repository>
-      <uniqueVersion>false</uniqueVersion>
-      <id>smaa.fi</id>
-      <name>smaa.fi repository</name>
-      <url>scp://tommi@medusa.tutka.net/home/tommi/smaa_html/mvn</url>
-      <layout>default</layout>
-    </repository>
+    <distributionManagement>
+	<repository>
+	    <uniqueVersion>false</uniqueVersion>
+	    <id>smaa.fi</id>
+	    <name>smaa.fi repository</name>
+	    <url>scp://tommi@medusa.tutka.net/home/tommi/smaa_html/mvn</url>
+	    <layout>default</layout>
+	</repository>
     </distributionManagement>	
     
     <build>
 	<plugins>
 	    <plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-dependency-plugin</artifactId>
+		<executions>
+		    <execution>
+			<id>unpack-xsd-dependency</id>
+			<phase>initialize</phase>
+			<goals>
+			    <goal>unpack</goal>
+			</goals>
+		    </execution>
+		</executions>
+		<configuration>
+		    <artifactItems>
+			<artifactItem>
+			    <groupId>fi.smaa.jsmaa</groupId>
+			    <artifactId>lib</artifactId>
+			    <outputDirectory>target/xsd</outputDirectory>
+			    <includes>schemaorg_apache_xmlbeans/src/*.xsd</includes>
+			</artifactItem>
+		    </artifactItems>
+		</configuration>
+	    </plugin>
+	    <plugin>
+		<artifactId>maven-compiler-plugin</artifactId>  
+                <configuration>  
+                    <source>1.5</source>
+		    <target>1.5</target>  
+                </configuration>  
+            </plugin>
+	    <plugin>
 		<artifactId>maven-eclipse-plugin</artifactId>
 		<configuration>
+		    <source>1.5</source>
+		    <target>1.5</target>
 		    <downloadJavadocs>true</downloadJavadocs>
 		    <downloadSources>true</downloadSources>
 		    <sourceIncludes>
