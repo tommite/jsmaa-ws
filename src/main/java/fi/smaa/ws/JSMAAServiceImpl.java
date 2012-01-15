@@ -1,66 +1,80 @@
 package fi.smaa.ws;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 
+import org.decisionDeck.xmcda3.AlternativeSetType;
+import org.decisionDeck.xmcda3.AlternativeType;
+import org.decisionDeck.xmcda3.CriterionType;
+import org.decisionDeck.xmcda3.SMAA2ModelDocument;
+import org.decisionDeck.xmcda3.SMAA2ResultsDocument;
+import org.decisionDeck.xmcda3.UtilityCriterionSetType;
+import org.decisionDeck.xmcda3.UtilityCriterionType;
 import org.drugis.common.threading.ThreadHandler;
 
-import noNamespace.AlternativeType;
-import noNamespace.SMAATRIModelDocument;
 import fi.smaa.jsmaa.model.Alternative;
+import fi.smaa.jsmaa.model.Criterion;
+import fi.smaa.jsmaa.model.SMAAModel;
 import fi.smaa.jsmaa.model.SMAATRIModel;
-import fi.smaa.jsmaa.model.xml.xmlbeans.NonserializableModelException;
-import fi.smaa.jsmaa.model.xml.xmlbeans.XMLBeansSerializer;
+import fi.smaa.jsmaa.model.ScaleCriterion;
+import fi.smaa.jsmaa.simulator.SMAA2Results;
+import fi.smaa.jsmaa.simulator.SMAA2Simulation;
 import fi.smaa.jsmaa.simulator.SMAATRIResults;
 import fi.smaa.jsmaa.simulator.SMAATRISimulation;
 
 @WebService(serviceName="JSMAAService")
 public class JSMAAServiceImpl implements JSMAAService{
 	
-	protected static ThreadHandler handler = ThreadHandler.getInstance();
+	private static ThreadHandler handler = ThreadHandler.getInstance();
 
-	@WebMethod(operationName="solveSMAATRI")
-	synchronized public Map<AlternativeType, List<Double>> solveSMAATRIModel(
-			@WebParam(name="model")SMAATRIModelDocument model
-			) {
-		XMLBeansSerializer ser = new XMLBeansSerializer();
+	@WebMethod(operationName="smaa2svc")
+	synchronized public SMAA2ResultsDocument smaa2(
+			@WebParam(name="model") SMAA2ModelDocument model) {
 
-		try {
-			SMAATRIModel smaaModel = ser.deSerialize(model);
-			SMAATRISimulation simul = new SMAATRISimulation(smaaModel, 10000);
+		SMAAModel smaaModel = deserializeSMAA2Model(model);
+		SMAA2Simulation simul = new SMAA2Simulation(smaaModel, 10000);
 
-			handler.scheduleTask(simul.getTask());
-			while(handler.getRunningThreads() > 0) {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-				}
-			}
-			SMAATRIResults res = simul.getResults();
-			return convertResults(res);
-		} catch (NonserializableModelException e) {
-			e.printStackTrace();
-			return null;
-		}
+		handler.scheduleTask(simul.getTask());
+		while(handler.getRunningThreads() > 0) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+			}	
+		}	
+		SMAA2Results res = simul.getResults();
+		return serializeSMAA2Results(res);
 	}
 
-	private Map<AlternativeType, List<Double>> convertResults(SMAATRIResults res) {
-		Map<AlternativeType, List<Double>> ret = new HashMap<AlternativeType, List<Double>>();
-		for (Alternative a : res.getAlternatives()) {
-			AlternativeType at = AlternativeType.Factory.newInstance();
-			at.setName(a.getName());
-			List<Double> vals = new ArrayList<Double>();
-			for (int i=0;i<res.getCategories().size();i++) {
-				vals.add(res.getCategoryAcceptabilities().get(a).get(i));
-			}
-			ret.put(at, vals);
+	private SMAA2ResultsDocument serializeSMAA2Results(SMAA2Results res) {
+		return null;
+	}
+
+	private SMAAModel deserializeSMAA2Model(SMAA2ModelDocument doc) {
+		Map<String, Alternative> altMap = new HashMap<String, Alternative>();
+		Map<String, Criterion> critMap = new HashMap<String, Criterion>();
+		
+		SMAATRIModel m = new SMAATRIModel("deserialized model");
+		SMAA2ModelDocument.SMAA2Model docm = doc.getSMAA2Model();
+		AlternativeSetType aset = docm.getAlternativeSet();
+	
+		for (AlternativeType at : aset.getAlternativeArray()) {
+			String key = at.getKey();
+			Alternative a = new Alternative(key);
+			m.addAlternative(a);
+			altMap.put(key, a);
 		}
-		return ret;
+		
+		UtilityCriterionSetType cset = docm.getCriterionSet();
+		
+		for (UtilityCriterionType ct : cset.getCriterionArray()) {
+			String key = ct.getKey();
+			ScaleCriterion c = new ScaleCriterion(key, ascending)
+		}
+		
+		return m;
 	}
 }

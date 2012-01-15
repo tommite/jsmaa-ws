@@ -12,41 +12,9 @@
 	    <url>http://smaa.fi/mvn</url>
 	</repository>
     </repositories>
-    <distributionManagement>
-	<repository>
-	    <uniqueVersion>false</uniqueVersion>
-	    <id>smaa.fi</id>
-	    <name>smaa.fi repository</name>
-	    <url>scp://tommi@medusa.tutka.net/home/tommi/smaa_html/mvn</url>
-	    <layout>default</layout>
-	</repository>
-    </distributionManagement>	
     
     <build>
 	<plugins>
-	    <plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-dependency-plugin</artifactId>
-		<executions>
-		    <execution>
-			<id>unpack-xsd-dependency</id>
-			<phase>initialize</phase>
-			<goals>
-			    <goal>unpack</goal>
-			</goals>
-		    </execution>
-		</executions>
-		<configuration>
-		    <artifactItems>
-			<artifactItem>
-			    <groupId>fi.smaa.jsmaa</groupId>
-			    <artifactId>lib</artifactId>
-			    <outputDirectory>target/xsd</outputDirectory>
-			    <includes>schemaorg_apache_xmlbeans/src/*.xsd</includes>
-			</artifactItem>
-		    </artifactItems>
-		</configuration>
-	    </plugin>
 	    <plugin>
 		<artifactId>maven-compiler-plugin</artifactId>  
                 <configuration>  
@@ -61,25 +29,7 @@
 		    <target>1.5</target>
 		    <downloadJavadocs>true</downloadJavadocs>
 		    <downloadSources>true</downloadSources>
-		    <sourceIncludes>
-			<sourceInclude>
-			    target/generated-sources/**/*.java
-			</sourceInclude>
-		    </sourceIncludes>
 		</configuration>
-	    </plugin>
-	    <plugin>
-		<groupId>org.codehaus.mojo</groupId>
-		<artifactId>xmlbeans-maven-plugin</artifactId>
-		<version>2.3.3</version>
-		<executions>
-		    <execution>
-			<phase>generate-sources</phase>
-			<goals>
-			    <goal>xmlbeans</goal>
-			</goals>
-		    </execution>
-		</executions>
 	    </plugin>
 	</plugins>		
     </build>
@@ -118,13 +68,18 @@
     <dependency>
       <groupId>fi.smaa.jsmaa</groupId>
       <artifactId>lib</artifactId>
-      <version>0.9-SNAPSHOT</version>
-	</dependency>
+      <version>0.8.5</version>
+    </dependency>
     <dependency>
       <groupId>org.apache.xmlbeans</groupId>
       <artifactId>xmlbeans</artifactId>
       <version>2.4.0</version>
-	</dependency>
+    </dependency>
+    <dependency>
+      <groupId>fi.smaa</groupId>
+      <artifactId>xmcda3-entities</artifactId>
+      <version>0.2</version>
+    </dependency>	
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

@@ -1,16 +1,14 @@
 package fi.smaa.ws;
 
-import java.util.List;
-import java.util.Map;
-
 import javax.jws.WebParam;
 import javax.jws.WebService;
 
-import noNamespace.AlternativeType;
-import noNamespace.SMAATRIModelDocument;
+import org.decisionDeck.xmcda3.SMAA2ModelDocument;
+import org.decisionDeck.xmcda3.SMAA2ResultsDocument;
+
 
 @WebService
 public interface JSMAAService {
-	public Map<AlternativeType, List<Double>> solveSMAATRIModel(
-			@WebParam(name="model") SMAATRIModelDocument model);
+	public SMAA2ResultsDocument smaa2(
+			@WebParam(name="model") SMAA2ModelDocument model);
 }
