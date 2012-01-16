@@ -10,5 +10,5 @@ import org.decisionDeck.xmcda3.SMAA2ResultsDocument;
 @WebService
 public interface JSMAAService {
 	public SMAA2ResultsDocument smaa2(
-			@WebParam(name="model") SMAA2ModelDocument model);
+			@WebParam(name="model") SMAA2ModelDocument model) throws InvalidModelException;
 }
