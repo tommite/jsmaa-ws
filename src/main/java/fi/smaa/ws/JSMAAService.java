@@ -6,6 +6,8 @@ import javax.jws.WebService;
 import org.decisionDeck.xmcda3.SMAA2ModelDocument;
 import org.decisionDeck.xmcda3.SMAA2ResultsDocument;
 
+import fi.smaa.jsmaa.xml.InvalidModelException;
+
 
 @WebService
 public interface JSMAAService {

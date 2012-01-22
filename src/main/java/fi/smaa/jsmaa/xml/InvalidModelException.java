@@ -1,4 +1,4 @@
-package fi.smaa.ws;
+package fi.smaa.jsmaa.xml;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
