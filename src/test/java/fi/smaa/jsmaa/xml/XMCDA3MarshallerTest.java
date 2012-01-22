@@ -1,7 +1,9 @@
 package fi.smaa.jsmaa.xml;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
 
 import org.decisionDeck.xmcda3.SMAA2ModelDocument;
 import org.junit.Before;
@@ -11,8 +13,10 @@ import fi.smaa.jsmaa.model.Alternative;
 import fi.smaa.jsmaa.model.Criterion;
 import fi.smaa.jsmaa.model.ExactMeasurement;
 import fi.smaa.jsmaa.model.Interval;
+import fi.smaa.jsmaa.model.Measurement;
 import fi.smaa.jsmaa.model.SMAAModel;
 import fi.smaa.jsmaa.model.ScaleCriterion;
+import fi.smaa.jsmaa.simulator.SMAA2Results;
 
 public class XMCDA3MarshallerTest {
 
@@ -28,9 +32,24 @@ public class XMCDA3MarshallerTest {
 	private Interval m22;
 	private SMAA2ModelDocument modelDoc;
 	private SMAAModel model2;
+	private SMAA2Results results;
 
 	@Before
 	public void setUp() throws InvalidModelException {
+		model = createSMAA2Model();
+		
+		modelDoc = XMCDA3Marshaller.marshallModel(model);
+		model2 = XMCDA3Marshaller.unmarshallModel(modelDoc);
+		
+		results = createSMAA2Results();
+	}
+
+	private SMAA2Results createSMAA2Results() {
+		SMAA2Results res = new SMAA2Results(model.getAlternatives(), model.getCriteria(), 1);
+		return res;
+	}
+
+	public SMAAModel createSMAA2Model() {
 		model = new SMAAModel("model");
 		a1 = new Alternative("a1");
 		a2 = new Alternative("a2");
@@ -54,41 +73,45 @@ public class XMCDA3MarshallerTest {
 		model.setMeasurement(c2, a1, m21);
 		model.setMeasurement(c2, a2, m22);
 		
-		modelDoc = XMCDA3Marshaller.marshallModel(model);
-		model2 = XMCDA3Marshaller.unmarshallModel(modelDoc);
+		return model;
 	}
 	
 	@Test
 	public void testAlternatives() {
+		ArrayList<String> names = new ArrayList<String>();
 		for (Alternative a : model.getAlternatives()) {
-			String name = a.getName();
-			boolean found = false;
-			for (Alternative a2 : model2.getAlternatives()) {
-				if (a2.getName().equals(name)) {
-					found = true;
-					break;
-				}
-			}
-			assertTrue(found);
+			names.add(a.getName());
 		}
+		for (Alternative a : model2.getAlternatives()) {
+			assertTrue(names.contains(a.getName()));
+			names.remove(a.getName());
+		}
+		assertEquals(0, names.size());
 		assertEquals(model.getAlternatives().size(), model2.getAlternatives().size());
 	}
 	
 	@Test
-	public void testCriteria() {
+	public void testCriteria() throws InvalidModelException {
 		for (Criterion c : model.getCriteria()) {
 			ScaleCriterion sc = (ScaleCriterion) c;
-			String name = sc.getName();
-			boolean found = false;
-			for (Criterion a2 : model2.getCriteria()) {
-				ScaleCriterion sc2 = (ScaleCriterion) a2;
-				if (sc2.getName().equals(name) && sc2.getAscending() == sc.getAscending()) {
-					found = true;
-					break;
-				}
-			}
-			assertTrue(found);
+			ScaleCriterion sc2 = (ScaleCriterion) XMCDA3Marshaller.findCriterion(sc.getName(), model2.getCriteria());
+			assertEquals(sc.getName(), sc2.getName());
+			assertEquals(sc.getAscending(), sc2.getAscending());
 		}
 		assertEquals(model.getCriteria().size(), model2.getCriteria().size());		
+	}
+	
+	@Test
+	public void testMeasurements() throws InvalidModelException {
+		for (Criterion c : model.getCriteria()) {
+			for (Alternative a : model.getAlternatives()) {
+				Measurement m1meas = model.getMeasurement(c, a);
+				Measurement m2meas = model2.getMeasurement(
+						XMCDA3Marshaller.findCriterion(c.getName(), model2.getCriteria()),
+						XMCDA3Marshaller.findAlternative(a.getName(), model2.getAlternatives()));
+								
+				assertEquals(m2meas, m1meas);
+			}
+		}
 	}
 }

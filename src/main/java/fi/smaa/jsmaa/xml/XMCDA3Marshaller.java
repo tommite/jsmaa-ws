@@ -16,6 +16,7 @@ import org.decisionDeck.xmcda3.IntervalType;
 import org.decisionDeck.xmcda3.MeasurementType;
 import org.decisionDeck.xmcda3.SMAA2ModelDocument;
 import org.decisionDeck.xmcda3.SMAA2ModelDocument.SMAA2Model;
+import org.decisionDeck.xmcda3.SMAA2ResultsDocument;
 import org.decisionDeck.xmcda3.ValuedPairType;
 import org.decisionDeck.xmcda3.ValuedRelationType;
 
@@ -26,8 +27,15 @@ import fi.smaa.jsmaa.model.Interval;
 import fi.smaa.jsmaa.model.Measurement;
 import fi.smaa.jsmaa.model.SMAAModel;
 import fi.smaa.jsmaa.model.ScaleCriterion;
+import fi.smaa.jsmaa.simulator.SMAA2Results;
 
 public class XMCDA3Marshaller {
+	
+	public static SMAA2ResultsDocument marshallResults(SMAA2Results results) {
+		SMAA2ResultsDocument doc = SMAA2ResultsDocument.Factory.newInstance();
+		
+		return doc;
+	}
 
 	public static SMAAModel unmarshallModel(SMAA2ModelDocument doc) throws InvalidModelException {
 		
@@ -61,9 +69,9 @@ public class XMCDA3Marshaller {
 		for (ValuedPairType vp : perf.getValuedPairArray()) {
 			String fromName = vp.getFrom().getRef();
 			String toName = vp.getTo().getRef();
-			
-			Alternative a = XMCDA3Marshaller.getAlternativeWithName(fromName, m.getAlternatives());
-			Criterion c = XMCDA3Marshaller.getCriterionWithName(toName, m.getCriteria());
+						
+			Alternative a = findAlternative(fromName, m.getAlternatives());
+			Criterion c = findCriterion(toName, m.getCriteria());
 			Measurement meas = XMCDA3Marshaller.constructMeasurement(vp.getMeasurement());
 			m.setMeasurement(c, a, meas);
 		}
@@ -71,22 +79,22 @@ public class XMCDA3Marshaller {
 		return m;
 	}
 
-	private static Criterion getCriterionWithName(String name, List<Criterion> criteria) throws InvalidModelException {
+	public static Criterion findCriterion(String toName, List<Criterion> criteria) throws InvalidModelException {
 		for (Criterion c : criteria) {
-			if (c.getName().equals(name)) {
+			if (c.getName().equals(toName)) {
 				return c;
 			}
 		}
-		throw new InvalidModelException("No alternative with name " + name);		
+		throw new InvalidModelException("no criterion with name " + toName);
 	}
 
-	private static Alternative getAlternativeWithName(String name, List<Alternative> alts) throws InvalidModelException {
-		for (Alternative a : alts) {
-			if (a.getName().equals(name)) {
+	public static Alternative findAlternative(String fromName, List<Alternative> alternatives) throws InvalidModelException {
+		for (Alternative a : alternatives) {
+			if (a.getName().equals(fromName)) {
 				return a;
 			}
 		}
-		throw new InvalidModelException("No alternative with name " + name);
+		throw new InvalidModelException("no alternative with name "+ fromName);
 	}
 
 	private static Measurement constructMeasurement(MeasurementType measurement) throws InvalidModelException {

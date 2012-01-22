@@ -15,6 +15,7 @@ import fi.smaa.jsmaa.model.SMAAModel;
 import fi.smaa.jsmaa.model.ScaleCriterion;
 import fi.smaa.jsmaa.xml.InvalidModelException;
 import fi.smaa.jsmaa.xml.XMCDA3Marshaller;
+import fi.smaa.jsmaa.xml.XMCDA3MarshallerTest;
 
 public class JSMAAServiceTest {
 	
@@ -47,20 +48,8 @@ public class JSMAAServiceTest {
 	}
 	
 	private SMAAModel createSMAA2Model() {
-		SMAAModel model = new SMAAModel("model");
-		Alternative a1 = new Alternative("a1");
-		Alternative a2 = new Alternative("a2");
-		ScaleCriterion c1 = new ScaleCriterion("c1", true);
-		ScaleCriterion c2 = new ScaleCriterion("c2", true);		
-		model.addAlternative(a1);
-		model.addAlternative(a2);
-		model.addCriterion(c1);
-		model.addCriterion(c2);
-		model.setMeasurement(c1, a1, new ExactMeasurement(3.0));
-		model.setMeasurement(c2, a1, new ExactMeasurement(2.0));
-		model.setMeasurement(c1, a2, new ExactMeasurement(2.0));
-		model.setMeasurement(c2, a2, new ExactMeasurement(4.0));		
-		return model;
+		XMCDA3MarshallerTest t = new XMCDA3MarshallerTest();
+		return t.createSMAA2Model();
 	}
 	
 }
