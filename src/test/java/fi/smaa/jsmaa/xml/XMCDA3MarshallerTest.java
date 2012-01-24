@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 
 import org.decisionDeck.xmcda3.SMAA2ModelDocument;
+import org.decisionDeck.xmcda3.SMAA2ResultsDocument;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -37,16 +38,12 @@ public class XMCDA3MarshallerTest {
 	@Before
 	public void setUp() throws InvalidModelException {
 		model = createSMAA2Model();
-		
+		results = new SMAA2Results(model.getAlternatives(), model.getCriteria(), 1);
+		results.update(new int[]{0, 1}, new double[]{0.2, 0.8});
+		results.confidenceUpdate(new boolean[]{true, false});
+				
 		modelDoc = XMCDA3Marshaller.marshallModel(model);
 		model2 = XMCDA3Marshaller.unmarshallModel(modelDoc);
-		
-		results = createSMAA2Results();
-	}
-
-	private SMAA2Results createSMAA2Results() {
-		SMAA2Results res = new SMAA2Results(model.getAlternatives(), model.getCriteria(), 1);
-		return res;
 	}
 
 	public SMAAModel createSMAA2Model() {
@@ -74,6 +71,14 @@ public class XMCDA3MarshallerTest {
 		model.setMeasurement(c2, a2, m22);
 		
 		return model;
+	}
+	
+	@SuppressWarnings("unused")
+	@Test
+	public void testMarshallResults() {
+		SMAA2ResultsDocument docres = XMCDA3Marshaller.marshallResults(results);
+		// cannot really test these currently due to design flaws in JSMAA :/
+		// System.out.println(docres);
 	}
 	
 	@Test

@@ -2,6 +2,7 @@ package fi.smaa.jsmaa.xml;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.decisionDeck.xmcda3.AlternativeSetType;
@@ -12,7 +13,12 @@ import org.decisionDeck.xmcda3.CriterionSetType;
 import org.decisionDeck.xmcda3.CriterionType;
 import org.decisionDeck.xmcda3.DirectedCriterionType;
 import org.decisionDeck.xmcda3.ExactMeasurementType;
+import org.decisionDeck.xmcda3.ExactValuedEntitySetType;
+import org.decisionDeck.xmcda3.ExactValuedEntityType;
+import org.decisionDeck.xmcda3.ExactValuedPairType;
+import org.decisionDeck.xmcda3.ExactValuedRelationType;
 import org.decisionDeck.xmcda3.IntervalType;
+import org.decisionDeck.xmcda3.KeyedEntityReference;
 import org.decisionDeck.xmcda3.MeasurementType;
 import org.decisionDeck.xmcda3.SMAA2ModelDocument;
 import org.decisionDeck.xmcda3.SMAA2ModelDocument.SMAA2Model;
@@ -33,8 +39,58 @@ public class XMCDA3Marshaller {
 	
 	public static SMAA2ResultsDocument marshallResults(SMAA2Results results) {
 		SMAA2ResultsDocument doc = SMAA2ResultsDocument.Factory.newInstance();
-		
+		org.decisionDeck.xmcda3.SMAA2ResultsDocument.SMAA2Results docres = doc.addNewSMAA2Results();
+		addRankAcceptabilityIndices(docres.addNewRankAcceptabilityIndices(), results.getRankAcceptabilities());
+		addConfidenceFactors(docres.addNewConfidenceFactors(), results.getConfidenceFactors());
+		addCentralWeights(docres.addNewCentralWeightVectors(), results.getCentralWeightVectors());
 		return doc;
+	}
+
+	private static void addCentralWeights(ExactValuedRelationType doccw,
+			Map<Alternative, Map<Criterion, Double>> cws) {
+		for (Map.Entry<Alternative, Map<Criterion, Double>> e : cws.entrySet()) {
+			String altName = e.getKey().getName();
+			for (Map.Entry<Criterion, Double> e2 : e.getValue().entrySet()) {
+				ExactValuedPairType vp = doccw.addNewValuedPair();
+				KeyedEntityReference from = vp.addNewFrom();
+				from.setRef(altName);
+				KeyedEntityReference to = vp.addNewTo();
+				to.setRef(e2.getKey().getName());
+				ExactMeasurementType meas = vp.addNewMeasurement();
+				meas.setValue(e2.getValue());
+			}
+		}
+	}
+
+	private static void addConfidenceFactors(ExactValuedEntitySetType cfdoc,
+			Map<Alternative, Double> confidenceFactors) {
+		for (Map.Entry<Alternative, Double> e : confidenceFactors.entrySet()) {
+			ExactValuedEntityType p = cfdoc.addNewEntry();
+			KeyedEntityReference ent = p.addNewEntity();
+			ent.setRef(e.getKey().getName());
+			ExactMeasurementType meas = p.addNewMeasurement();
+			meas.setValue(e.getValue());
+		}
+	}
+
+	private static void addRankAcceptabilityIndices(ExactValuedRelationType docrel,
+			Map<Alternative, List<Double>> indices) {
+		for (Map.Entry<Alternative, List<Double>> e : indices.entrySet()) {
+			int index = 1;
+			for (Double d : e.getValue()) {
+				ExactValuedPairType vp = docrel.addNewValuedPair();
+				KeyedEntityReference from = KeyedEntityReference.Factory.newInstance();
+				from.setRef(e.getKey().getName());
+				KeyedEntityReference to = KeyedEntityReference.Factory.newInstance();
+				to.setRef("r"+index);
+				vp.setFrom(from);
+				vp.setTo(to);
+				ExactMeasurementType meas = ExactMeasurementType.Factory.newInstance();
+				meas.setValue(d);
+				vp.setMeasurement(meas);
+				index++;
+			}
+		}
 	}
 
 	public static SMAAModel unmarshallModel(SMAA2ModelDocument doc) throws InvalidModelException {
