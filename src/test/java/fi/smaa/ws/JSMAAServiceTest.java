@@ -9,10 +9,7 @@ import org.decisionDeck.xmcda3.SMAA2ResultsDocument;
 import org.junit.Before;
 import org.junit.Test;
 
-import fi.smaa.jsmaa.model.Alternative;
-import fi.smaa.jsmaa.model.ExactMeasurement;
 import fi.smaa.jsmaa.model.SMAAModel;
-import fi.smaa.jsmaa.model.ScaleCriterion;
 import fi.smaa.jsmaa.xml.InvalidModelException;
 import fi.smaa.jsmaa.xml.XMCDA3Marshaller;
 import fi.smaa.jsmaa.xml.XMCDA3MarshallerTest;
@@ -42,9 +39,12 @@ public class JSMAAServiceTest {
 		xmlModel = XMCDA3Marshaller.marshallModel(model);
 	}
 	
+	@SuppressWarnings("unused")
 	@Test
 	public void testService() throws InvalidModelException {
 		SMAA2ResultsDocument ret = clientService.smaa2(xmlModel);
+		//hard to test as the results are not really deserializable :/
+		//System.out.println(ret);
 	}
 	
 	private SMAAModel createSMAA2Model() {

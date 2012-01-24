@@ -7,10 +7,10 @@ import javax.jws.WebService;
 
 import org.decisionDeck.xmcda3.SMAA2ModelDocument;
 import org.decisionDeck.xmcda3.SMAA2ResultsDocument;
+import org.drugis.common.threading.Task;
 import org.drugis.common.threading.ThreadHandler;
 
 import fi.smaa.jsmaa.model.SMAAModel;
-import fi.smaa.jsmaa.simulator.SMAA2Results;
 import fi.smaa.jsmaa.simulator.SMAA2Simulation;
 import fi.smaa.jsmaa.xml.InvalidModelException;
 import fi.smaa.jsmaa.xml.XMCDA3Marshaller;
@@ -28,18 +28,14 @@ public class JSMAAServiceImpl implements JSMAAService{
 		SMAAModel smaaModel = XMCDA3Marshaller.unmarshallModel(model);
 		SMAA2Simulation simul = new SMAA2Simulation(smaaModel, NR_ITERS);
 
-		handler.scheduleTask(simul.getTask());
-		while(handler.getRunningThreads() > 0) {
+		Task task = simul.getTask();
+		handler.scheduleTask(task);
+		while(!task.isFinished() && !task.isFailed() && !task.isAborted()) {
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
-			}	
-		}	
-		SMAA2Results res = simul.getResults();
-		return serializeSMAA2Results(res);
+			}
+		}
+		return XMCDA3Marshaller.marshallResults(simul.getResults());
 	}
-
-	private SMAA2ResultsDocument serializeSMAA2Results(SMAA2Results res) {
-		return null;
-	}	
 }
