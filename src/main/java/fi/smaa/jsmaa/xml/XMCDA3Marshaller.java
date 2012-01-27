@@ -23,14 +23,19 @@ import org.decisionDeck.xmcda3.MeasurementType;
 import org.decisionDeck.xmcda3.SMAA2ModelDocument;
 import org.decisionDeck.xmcda3.SMAA2ModelDocument.SMAA2Model;
 import org.decisionDeck.xmcda3.SMAA2ResultsDocument;
+import org.decisionDeck.xmcda3.ValuedEntitySetType;
+import org.decisionDeck.xmcda3.ValuedEntityType;
 import org.decisionDeck.xmcda3.ValuedPairType;
 import org.decisionDeck.xmcda3.ValuedRelationType;
 
 import fi.smaa.jsmaa.model.Alternative;
+import fi.smaa.jsmaa.model.CardinalMeasurement;
+import fi.smaa.jsmaa.model.CardinalPreferenceInformation;
 import fi.smaa.jsmaa.model.Criterion;
 import fi.smaa.jsmaa.model.ExactMeasurement;
 import fi.smaa.jsmaa.model.Interval;
 import fi.smaa.jsmaa.model.Measurement;
+import fi.smaa.jsmaa.model.OrdinalPreferenceInformation;
 import fi.smaa.jsmaa.model.SMAAModel;
 import fi.smaa.jsmaa.model.ScaleCriterion;
 import fi.smaa.jsmaa.simulator.SMAA2Results;
@@ -94,8 +99,8 @@ public class XMCDA3Marshaller {
 	}
 
 	public static SMAAModel unmarshallModel(SMAA2ModelDocument doc) throws InvalidModelException {
-		
-		SMAAModel m = new SMAAModel("unmarshalled model");
+
+		SMAAModel m = new SMAAModel("Unmarshalled model");
 		SMAA2ModelDocument.SMAA2Model docm = doc.getSMAA2Model();
 		AlternativeSetType aset = docm.getAlternativeSet();
 	
@@ -132,6 +137,17 @@ public class XMCDA3Marshaller {
 			m.setMeasurement(c, a, meas);
 		}
 		
+		ValuedEntitySetType w = docm.getWeights();
+		if (w != null) {
+			ValuedEntityType[] ws = w.getEntryArray();
+			CardinalPreferenceInformation pref = new CardinalPreferenceInformation(m.getCriteria());
+			for (ValuedEntityType v : ws) {
+				Criterion c = findCriterion(v.getEntity().getRef(), m.getCriteria());
+				pref.setMeasurement(c, constructMeasurement(v.getMeasurement()));
+			}
+			m.setPreferenceInformation(pref);
+		}
+		
 		return m;
 	}
 
@@ -153,7 +169,7 @@ public class XMCDA3Marshaller {
 		throw new InvalidModelException("no alternative with name "+ fromName);
 	}
 
-	private static Measurement constructMeasurement(MeasurementType measurement) throws InvalidModelException {
+	private static CardinalMeasurement constructMeasurement(MeasurementType measurement) throws InvalidModelException {
 		if (measurement instanceof ExactMeasurementType) {
 			ExactMeasurementType t = (ExactMeasurementType) measurement;
 			ExactMeasurement m = new ExactMeasurement(t.getValue());
@@ -214,6 +230,20 @@ public class XMCDA3Marshaller {
 			}
 		}
 		
+		if (model2.getPreferenceInformation() instanceof CardinalPreferenceInformation) {
+			CardinalPreferenceInformation p = (CardinalPreferenceInformation) model2.getPreferenceInformation();
+			ValuedEntitySetType weights = m.addNewWeights();
+			for (Criterion c : model2.getCriteria()) {
+				ValuedEntityType e = weights.addNewEntry();
+				KeyedEntityReference from = KeyedEntityReference.Factory.newInstance();
+				from.setRef(c.getName());
+				e.setEntity(from);
+				CardinalMeasurement meas = p.getMeasurement(c);
+				e.setMeasurement(marshallMeasurement(meas));
+			}
+		} else if (model2.getPreferenceInformation() instanceof OrdinalPreferenceInformation) {
+		 	throw new InvalidModelException("Invalid preference information: cannot marshall ordinal preferences");
+		}
 		return mdoc;
 	}
 

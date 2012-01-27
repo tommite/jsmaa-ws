@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import fi.smaa.jsmaa.model.Alternative;
+import fi.smaa.jsmaa.model.CardinalPreferenceInformation;
 import fi.smaa.jsmaa.model.Criterion;
 import fi.smaa.jsmaa.model.ExactMeasurement;
 import fi.smaa.jsmaa.model.Interval;
@@ -74,7 +75,12 @@ public class XMCDA3MarshallerTest {
 	}
 
 	public SMAAModel createSMAA2Model() {
-		return createSMAA2ModelWithoutWeights();
+		SMAAModel mo = createSMAA2ModelWithoutWeights();
+		CardinalPreferenceInformation pref = new CardinalPreferenceInformation(mo.getCriteria());
+		pref.setMeasurement(c1, new Interval(0.2, 0.8));
+		pref.setMeasurement(c2, new Interval(0.4, 0.9));
+		mo.setPreferenceInformation(pref);
+		return mo;
 	}
 	
 	@SuppressWarnings("unused")
@@ -83,6 +89,15 @@ public class XMCDA3MarshallerTest {
 		SMAA2ResultsDocument docres = XMCDA3Marshaller.marshallResults(results);
 		// cannot really test these currently due to design flaws in JSMAA :/
 		// System.out.println(docres);
+	}
+	
+	@Test
+	public void testCardinal() {
+		CardinalPreferenceInformation p = (CardinalPreferenceInformation) model2.getPreferenceInformation();
+		Interval i1 = (Interval) p.getMeasurement(model2.getCriteria().get(0));
+		Interval i2 = (Interval) p.getMeasurement(model2.getCriteria().get(1));
+		assertEquals(new Interval(0.2, 0.8), i1);
+		assertEquals(new Interval(0.4, 0.9), i2);
 	}
 	
 	@Test

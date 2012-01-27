@@ -2,7 +2,6 @@ package fi.smaa.ws;
 
 
 import javax.xml.soap.SOAPException;
-import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;

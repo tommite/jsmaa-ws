@@ -11,6 +11,7 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFactory;
 import javax.xml.ws.soap.SOAPFaultException;
 
+import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlOptions;
 import org.decisionDeck.xmcda3.SMAA2ModelDocument;
 import org.decisionDeck.xmcda3.SMAA2ResultsDocument;
@@ -48,19 +49,25 @@ public class JSMAAServiceImpl implements JSMAAService {
 			return XMCDA3Marshaller.marshallResults(simul.getResults());
 		} catch (InvalidModelException e) {
 			SOAPFactory fac = SOAPFactory.newInstance();
-			SOAPFaultException sex = new SOAPFaultException(fac.createFault("Invalid model",QName.valueOf("1")));
+			SOAPFaultException sex = new SOAPFaultException(fac.createFault("Invalid model: " + e.getMessage(), QName.valueOf("1")));
 			throw sex;
 		}
 
 	}
 
 	private void validateInput(SMAA2ModelDocument model) throws InvalidModelException {
-		ArrayList<String> validationErrors = new ArrayList<String>();
+		System.out.println(model);
+		ArrayList<XmlError> validationErrors = new ArrayList<XmlError>();
 		XmlOptions opt = new XmlOptions();
 		opt.setErrorListener(validationErrors);
 		boolean valid = model.validate();
 		if (!valid) {
-			throw new InvalidModelException(validationErrors.toString());
+			String s = "";
+			for (XmlError x : validationErrors) {
+				s += x.getMessage() + " ";
+			}
+			s = s.trim();
+			throw new InvalidModelException(s);
 		}
 	}
 }
