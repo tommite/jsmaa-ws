@@ -45,8 +45,8 @@ public class XMCDA3MarshallerTest {
 		modelDoc = XMCDA3Marshaller.marshallModel(model);
 		model2 = XMCDA3Marshaller.unmarshallModel(modelDoc);
 	}
-
-	public SMAAModel createSMAA2Model() {
+	
+	public SMAAModel createSMAA2ModelWithoutWeights() {
 		model = new SMAAModel("model");
 		a1 = new Alternative("a1");
 		a2 = new Alternative("a2");
@@ -71,6 +71,10 @@ public class XMCDA3MarshallerTest {
 		model.setMeasurement(c2, a2, m22);
 		
 		return model;
+	}
+
+	public SMAAModel createSMAA2Model() {
+		return createSMAA2ModelWithoutWeights();
 	}
 	
 	@SuppressWarnings("unused")
